@@ -1,6 +1,6 @@
 import "../src/pages/index.css";
 import avatarImage from "./images/avatar.jpg";
-import { openModal, closeModal } from "./components/modal.js";
+import { openModal, closeModal, closePopupEsc } from "./components/modal.js";
 import { createCard, deleteCard, putLike } from "./components/card.js";
 import {initialCards} from "./components/cards.js"
 //Добавил аватар
@@ -15,6 +15,8 @@ const editProfileButton = document.querySelector(".profile__edit-button");
 const addCardButton = document.querySelector(".profile__add-button");
 
 const cardList = document.querySelector(".places__list");
+
+const popupCrossButtons = document.querySelectorAll(".popup__close");
 
 //Формы
 const newCardForm = document.querySelector(".popup_type_new-card");
@@ -43,6 +45,23 @@ editProfileButton.addEventListener("click", function () {
 addCardButton.addEventListener("click", function () {
     openModal(popupAddCard, closeModal);
 });
+
+// Закрытие на крестик
+popupCrossButtons.forEach(function (button) {
+  button.addEventListener("click", function () {
+    const popup = button.closest(".popup");
+    closeModal(popup);
+  });
+});
+
+
+// //закрытие на клик вне попапа
+// document.addEventListener("mousedown", function (evt) {
+//   const openedPopup = document.querySelector(".popup_is-opened");
+//   if (openedPopup && evt.target === openedPopup) {
+//     closeModal(openedPopup);
+//   }
+// });
 
 //Функции для форм
   //Функция для редактирования профиля
