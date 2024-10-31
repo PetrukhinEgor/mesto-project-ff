@@ -7,6 +7,28 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  transition: opacity 0.3s;
+  cursor: pointer;
+}
+
+.profile__avatar:hover .profile__image {
+  opacity: 0.2;
+}
+
+.profile__avatar:hover .profile-edit-icon {
+  opacity: 1;
+}
+
+.profile__avatar {
+  position: relative;
+}
+
+.profile-edit-icon {
+  position: absolute;
+  opacity: 0;
+  right: 75px;
+  top: 50px;
+  transition: opacity 0.3s;
 }
 
 @media screen and (max-width: 740px) {
