@@ -19,4 +19,14 @@
 ### Установка и запуск проекта
 1. Клонируйте репозиторий:
    ```bash
-   [git clone https://github.com/PetrukhinEgor/mesto-project-ff.git
+   git clone https://github.com/PetrukhinEgor/mesto-project-ff.git
+2. Перейдите в директорию проекта:
+   ```bash
+   cd mesto
+3.Установите проект:
+   ```bash
+   npm install
+```
+4.Запустите проект в режиме разработки:
+```bash
+    npm run dev
