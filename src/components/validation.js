@@ -1,82 +1,85 @@
 // Функция для показа ошибки
-const showError = (formElement, inputElement, errorMessage) => {
+const showError = (formElement, inputElement, errorMessage, selectors) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-  inputElement.classList.add("popup__input_type_error");
+  inputElement.classList.add(selectors.inputErrorClass);
   if (errorElement) {
     errorElement.textContent = errorMessage;
-    errorElement.classList.add("popup__input-error");
+    errorElement.classList.add(selectors.errorClass);
   }
 };
 
 // Функция для скрытия ошибки
-const hideError = (formElement, inputElement) => {
+const hideError = (formElement, inputElement, selectors) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-  inputElement.classList.remove("popup__input_type_error");
-  errorElement.classList.remove("popup__input-error");
-  errorElement.textContent = "";
+  inputElement.classList.remove(selectors.inputErrorClass);
+  if (errorElement) {
+    errorElement.classList.remove(selectors.errorClass);
+    errorElement.textContent = "";
+  }
+};
+
+// Функция для переключения состояния кнопки
+const toggleButtonState = (inputList, button, selectors) => {
+  if (inputList.some((input) => !input.validity.valid)) {
+    button.setAttribute("disabled", true);
+    button.classList.add(selectors.inactiveButtonClass);
+  } else {
+    button.removeAttribute("disabled");
+    button.classList.remove(selectors.inactiveButtonClass);
+  }
 };
 
 // Установка слушателей событий на каждый инпут
-const setEventListeners = (formElement) => {
-  const inputList = Array.from(formElement.querySelectorAll(".popup__input"));
+const setEventListeners = (formElement, selectors) => {
+  const inputList = Array.from(formElement.querySelectorAll(selectors.inputSelector));
+  const formBtn = formElement.querySelector(selectors.submitButtonSelector);
+
+  // Включение/отключение кнопки при вводе данных
   inputList.forEach((inputElement) => {
     inputElement.addEventListener("input", () => {
-      checkInputValidity(formElement, inputElement);
-    });
-  });
-
-  formElement.addEventListener("submit", (event) => {
-    event.preventDefault();
-    inputList.forEach((inputElement) => {
-      checkInputValidity(formElement, inputElement);
+      checkInputValidity(formElement, inputElement, selectors);
+      toggleButtonState(inputList, formBtn, selectors);
     });
   });
 };
-
-// Включение валидации для каждой формы
-export const enableValidation = () => {
-  const formList = Array.from(document.querySelectorAll(".popup__form"));
-  formList.forEach((form) => {
-    setEventListeners(form);
-  });
-};
-
-// const formBtn = document.querySelector('.popup__button');
-const allowedPattern = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/;
-const urlPattern =
-  /^(https?:\/\/)?([\da-z\.-]+\.[a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
 
 // Проверка валидности инпутов
-export const checkInputValidity = (formElement, inputElement) => {
+export const checkInputValidity = (formElement, inputElement, selectors) => {
   const errorMessage =
     inputElement.dataset.errorMessage || "Поле заполнено некорректно.";
 
   if (inputElement.validity.valueMissing) {
-    showError(formElement, inputElement, "Вы пропустили это поле.");
+    showError(formElement, inputElement, "Вы пропустили это поле.", selectors);
   } else if (
     inputElement.type === "text" &&
-    !allowedPattern.test(inputElement.value)
+    !/^[a-zA-Zа-яА-ЯёЁ\s-]+$/.test(inputElement.value)
   ) {
-    showError(formElement, inputElement, errorMessage);
+    showError(formElement, inputElement, errorMessage, selectors);
   } else if (
     inputElement.type === "url" &&
-    !urlPattern.test(inputElement.value)
+    !/^(https?:\/\/)?([\da-z.-]+\.[a-z.]{2,6})([\/\w.-]*)*\/?$/.test(inputElement.value)
   ) {
-    showError(formElement, inputElement, "Введите корректный URL.");
+    showError(formElement, inputElement, "Введите корректный URL.", selectors);
   } else {
-    hideError(formElement, inputElement);
+    hideError(formElement, inputElement, selectors);
   }
 };
 
 // Функция для очистки ошибок валидации и деактивации кнопки
-export const clearValidation = (formElement) => {
-  const inputList = Array.from(formElement.querySelectorAll(".popup__input"));
-  const formBtn = formElement.querySelector(".popup__button");
+export const clearValidation = (formElement, selectors) => {
+  const inputList = Array.from(formElement.querySelectorAll(selectors.inputSelector));
+  const formBtn = formElement.querySelector(selectors.submitButtonSelector);
 
   // Скрытие ошибок на всех инпутах формы
-  inputList.forEach((inputElement) => hideError(formElement, inputElement));
+  inputList.forEach((inputElement) => hideError(formElement, inputElement, selectors));
   formBtn.removeAttribute("disabled");
+  formBtn.classList.remove(selectors.inactiveButtonClass);
 };
 
-// Вызов функции enableValidation с селектором форм
-enableValidation();
+// Включение валидации для каждой формы
+export const enableValidation = (selectors) => {
+  const formList = Array.from(document.querySelectorAll(selectors.formSelector));
+  formList.forEach((formElement) => {
+    setEventListeners(formElement, selectors);
+  });
+};

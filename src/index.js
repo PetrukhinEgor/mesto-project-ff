@@ -5,6 +5,7 @@ import { createCard, deleteCard, putLike } from "./components/card.js";
 import {
   checkInputValidity,
   clearValidation,
+  enableValidation,
 } from "./components/validation.js";
 import {
   getUserInfo,
@@ -26,7 +27,7 @@ Promise.all([getUserInfo(), getCards()])
       const cardElement = createCard(
         item.name,
         item.link,
-        item.likes.length,
+        item.likes,
         item._id,
         item.owner._id,
         currentUserId,
@@ -57,7 +58,8 @@ const popupCrossButtons = document.querySelectorAll(".popup__close");
 const profileAvatar = document.querySelector(".profile__avatar");
 
 profileAvatar.addEventListener("click", function () {
-  openModal(avatarEditForm, closeModal);
+  clearValidation(avatarEditForm);
+  openModal(avatarEditForm);
 });
 
 // Формы
@@ -84,33 +86,32 @@ const popupWideCard = document.querySelector(".popup_type_image");
 const popupImage = popupWideCard.querySelector(".popup__image");
 const popupCaption = popupWideCard.querySelector(".popup__caption");
 
+// Валидация форм
+enableValidation({
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+});
+
 // Обработчики событий
 editProfileButton.addEventListener("click", function () {
   // Отобразить в полях ввода инфу
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
-  openModal(popupEditProfile, closeModal);
+  clearValidation(profileEditForm, {
+    inputSelector: ".popup__input",
+    submitButtonSelector: ".popup__button",
+    inactiveButtonClass: "popup__button_disabled",
+    inputErrorClass: "popup__input_type_error",
+    errorClass: "popup__error_visible",
+  });
+  openModal(popupEditProfile);
 });
 addCardButton.addEventListener("click", function () {
-  openModal(popupAddCard, closeModal);
-});
-
-// Валидация форм
-formInput.addEventListener("input", () => {
-  checkInputValidity(form, formInput);
-});
-
-// Вызов clearValidation при открытии формы
-profileEditForm.addEventListener("click", () => {
-  clearValidation(profileEditForm);
-});
-
-newCardForm.addEventListener("click", () => {
-  clearValidation(newCardForm);
-});
-
-avatarEditForm.addEventListener("click", () => {
-  clearValidation(avatarEditForm);
+  openModal(popupAddCard);
 });
 
 // Закрытие на крестик
@@ -148,6 +149,7 @@ profileEditForm.addEventListener("submit", handleFormProfileSubmit);
 // Функция для добавления новой карточки
 function handleFormCardSubmit(evt) {
   evt.preventDefault();
+  clearValidation(profileEditForm);
   const cardTitleValue = titleInput.value;
   const cardImgValue = imgInput.value;
 
@@ -205,5 +207,5 @@ function handleCardImageClick(evt) {
   popupImage.alt = cardImage.alt;
   popupCaption.textContent = cardImage.alt;
 
-  openModal(popupWideCard, closeModal);
+  openModal(popupWideCard);
 }

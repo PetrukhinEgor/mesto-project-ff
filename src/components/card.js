@@ -1,9 +1,9 @@
-import { likeCard, unlikeCard } from "./api";
+import { likeCard, unlikeCard, deleteCardFromServer} from "./api";
 
 export function createCard(
   cardTitleValue,
   cardImageValue,
-  likesCount,
+  likes, 
   cardId,
   ownerId,
   currentUserId,
@@ -22,9 +22,15 @@ export function createCard(
   cardImage.alt = cardTitleValue;
 
   const likeCountElement = cardElement.querySelector(".card__like-count");
-  likeCountElement.textContent = likesCount;
+  likeCountElement.textContent = likes.length; 
 
   const likeButton = cardElement.querySelector(".card__like-button");
+
+
+  if (likes.some((like) => like._id === currentUserId)) {
+    likeButton.classList.add("card__like-button_is-active");
+  }
+
   likeButton.addEventListener("click", function () {
     putLike(cardId, likeButton, likeCountElement);
   });
@@ -37,30 +43,19 @@ export function createCard(
   } else {
     cardElement.querySelector(".card__delete-button").style.display = "none";
   }
-  
+
   return cardElement;
 }
 
 export function deleteCard(cardId, cardElement) {
-  fetch(`https://nomoreparties.co/v1/wff-cohort-26/cards/${cardId}`, {
-    method: "DELETE",
-    headers: {
-      authorization: "daed3754-3575-4e1a-a7d0-daae90f95c75",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => {
-      if (res.ok) {
-        cardElement.remove();
-      } else {
-        console.error("Ошибка при удалении карточки");
-      }
+  deleteCardFromServer(cardId)
+    .then(() => {
+      cardElement.remove();
     })
-    .catch((err) => {
-      console.error("Ошибка:", err);
+    .catch((error) => {
+      console.error("Ошибка при удалении карточки:", error);
     });
 }
-
 
 export function putLike(cardId, likeButton, likeCountElement) {
   const isLiked = likeButton.classList.contains("card__like-button_is-active");
