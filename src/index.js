@@ -87,27 +87,21 @@ const popupImage = popupWideCard.querySelector(".popup__image");
 const popupCaption = popupWideCard.querySelector(".popup__caption");
 
 // Валидация форм
-enableValidation({
+const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
   inactiveButtonClass: "popup__button_disabled",
   inputErrorClass: "popup__input_type_error",
   errorClass: "popup__error_visible",
-});
+};
 
 // Обработчики событий
 editProfileButton.addEventListener("click", function () {
   // Отобразить в полях ввода инфу
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
-  clearValidation(profileEditForm, {
-    inputSelector: ".popup__input",
-    submitButtonSelector: ".popup__button",
-    inactiveButtonClass: "popup__button_disabled",
-    inputErrorClass: "popup__input_type_error",
-    errorClass: "popup__error_visible",
-  });
+  clearValidation(profileEditForm, validationConfig);
   openModal(popupEditProfile);
 });
 addCardButton.addEventListener("click", function () {
@@ -149,7 +143,6 @@ profileEditForm.addEventListener("submit", handleFormProfileSubmit);
 // Функция для добавления новой карточки
 function handleFormCardSubmit(evt) {
   evt.preventDefault();
-  clearValidation(profileEditForm);
   const cardTitleValue = titleInput.value;
   const cardImgValue = imgInput.value;
 
@@ -169,6 +162,7 @@ function handleFormCardSubmit(evt) {
       closeModal(newCardForm);
       titleInput.value = "";
       imgInput.value = "";
+      clearValidation(profileEditForm, validationConfig);
     })
     .catch((error) => console.log(error))
     .finally(() => {
